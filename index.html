@@ -7,9 +7,9 @@
     <script src="./build/tracking-min.js"></script>
     <script src="./build/data/face-min.js"></script>
     <script src="./assets/stats.min.js"></script>
-
+    <script src="./face.js"></script>
   </head>
-  <body onload="init();">
+  <body>
     <h1>User Interface:</h1>
     <!-- <p>Click on the streamming video to take a snapshot.</p>
     <button onclick="snapshot()">snapshot</button> -->
@@ -18,117 +18,10 @@
       <canvas id="render" width="1280" height="720" style="position:absolute; top:0px; left:0px; z-index:2;"></canvas>
     </div>
 
+    <h1>Face Detection:</h1>
+      <canvas id ="min" width="320" height="180"></canvas>
+      <!-- <canvas id ="output" width="320" height="180"></canvas> -->
     <h1>Grabbed Image:</h1>
-      <canvas id="dst" width="1280" height="720" ></canvas>
+      <canvas id="src" width="1280" height="720" ></canvas>
   </body>
-
-  <script>
-    var video;
-    // var webcamStream;
-    var render, render_ctx, dst, dst_ctx; // canvas for snapshot
-    var tracker = new tracking.ObjectTracker("face");
-    var tic, toc // calculate detect fps
-
-    // get user media
-    navigator.getUserMedia = ( navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia ||
-      navigator.msGetUserMedia);
-
-    function handleError(e) {
-      if (e.name == "PermissionDeniedError") {
-        logMessage("It looks like you\"ve denied access to the camera.");
-      }
-      else if (e.name == "SourceUnavailableError") {
-        logMessage("It looks like your camera is <b>used</b> by another application.");
-      }
-      else {
-        logMessage("The camera is unavailable. The error message is: " +e.message);
-      }
-    }
-
-    function dealWithStream(localMediaStream) {
-      video = document.querySelector("video");
-      // video.src = window.URL.createObjectURL(localMediaStream);
-      video.srcObject = localMediaStream
-      // webcamStream = localMediaStream;
-    }
-
-    function startWebcam() {
-      var constraints = {
-        audio: false,
-        video: {
-          optional: [
-            {minWidth: 320},
-            {minWidth: 640},
-            {minWidth: 800},
-            {minWidth: 900},
-            {minWidth: 1024},
-            {minWidth: 1280},
-            {minWidth: 1920},
-            {minWidth: 2560}
-          ]
-        }
-      };
-
-      if (navigator.getUserMedia) {
-          navigator.getUserMedia (constraints, dealWithStream, handleError);
-      } else {
-          console.log("getUserMedia not supported");
-      }  
-    }
-
-    function init() {
-      startWebcam()
-      render = document.getElementById("render");
-      render_ctx = render.getContext("2d");
-      dst = document.getElementById("dst");
-      dst_ctx = dst.getContext("2d");
-
-      tracker.setInitialScale(4);
-      tracker.setStepSize(2);
-      tracker.setEdgesDensity(0.1);
-      tracking.track("#video", tracker, { camera: true });
-
-      tracker.on("track", function(event) {
-        console.log("video size: " + video.videoWidth + "x" + video.videoHeight)
-        tic = performance.now()
-        render_ctx.clearRect(0, 0, render.width, render.height)
-        if (event.data.length === 0) {
-          // No face were detected in this frame.
-          console.log("no face");
-        }
-        else {
-          putText()
-          // snapshot()
-          // event.data.forEach(drawBoundingBox)
-          console.log("post something");
-        }
-        toc = performance.now()
-        console.log(toc-tic)
-      })
-    }
-
-    function drawBoundingBox(rect) {
-      dst_ctx.strokeStyle = "#a64ceb";
-      dst_ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-      dst_ctx.font = "11px Helvetica";
-      dst_ctx.fillStyle = "#fff";
-      dst_ctx.fillText("x: " + rect.x + "px", rect.x + rect.width + 5, rect.y + 11);
-      dst_ctx.fillText("y: " + rect.y + "px", rect.x + rect.width + 5, rect.y + 22);
-    }
-
-    function putText() {
-      render_ctx.font = "36px Helvetica";
-      render_ctx.fillStyle = "#f00";
-      render_ctx.fillText("Face Detected!", 500, 480);
-    }
-
-    function snapshot() {
-      // Draws current image from the video element into the canvas
-      dst_ctx.drawImage(video, 0, 0, dst.width, dst.height);
-      // dst_ctx.drawImage(video, 320, 180, 640, 360, 0, 0, dst.width, dst.height);
-    }
-
-  </script>
 </html>
