@@ -7,17 +7,19 @@
     <script src="./build/tracking-min.js"></script>
     <script src="./build/data/face-min.js"></script>
     <script src="./assets/stats.min.js"></script>
+    <script src="./assets/dat.gui.min.js"></script>
     <script src="./face.js"></script>
   </head>
   <body>
     <!-- User Interface -->
     <div id=ui style="position: relateive;; top:0px; left:0px">
       <p id=text style="position:relative; z-index:10; color:red; font-size:36px; font-weight:bold; text-align:center;"></p>
-      <video id="video" autoplay style="position:absolute; top:0px; left:0px; z-index:1; -moz-transform: scale(-1, 1); -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1); transform: scale(-1, 1); filter: FlipH;"></video>
+      <video id="video" autoplay style="position:absolute; top:0px; left:0px; -moz-transform: scale(-1, 1); -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1); transform: scale(-1, 1); filter: FlipH;"></video>
     </div>
 
     <!-- Face Detection -->
-    <canvas id ="min" width="640" height="360" style="position:fixed; top:10px; left:10px; z-index:100; border-width:5px;border-style:solid; border-color:#FFAC55;-webkit-transform: scaleX(-1); transform: scaleX(-1);"></canvas>
+    <canvas id ="min" width="320" height="180" style="position:fixed; top:10px; left:10px; z-index:10; border-width:5px;border-style:solid; border-color:#FFAC55;-webkit-transform: scaleX(-1); transform: scaleX(-1);"></canvas>
+    <div id="detector_gui" style="position:fixed; top:20px; right:20px; z-index:100"></div>
 
     <!-- Grabbed Image -->
     <canvas id="src" style="display:none;"></canvas>
