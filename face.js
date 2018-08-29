@@ -1,5 +1,7 @@
 window.onload = function(){
 
+    ui = document.getElementById("ui")
+    text = document.getElementById("text")
     // canvas for snapshot
     src = document.getElementById("src");
     src_ctx = src.getContext("2d");
@@ -7,10 +9,6 @@ window.onload = function(){
     // canvas for face detection
     min = document.getElementById("min");
     min_ctx = min.getContext("2d");
-
-    // canvas for render
-    render = document.getElementById("render");
-    render_ctx = render.getContext("2d");
 
     startWebcam()
 
@@ -21,13 +19,13 @@ window.onload = function(){
     tracker.setEdgesDensity(0.1);
 
     tracker.on("track", function(event) {
-        render_ctx.clearRect(0, 0, render.width, render.height);
+        text.innerHTML = ""
         if (event.data.length === 0) {
             // No face were detected in this frame.
             // console.log("no face");
         }
         else {
-            renderText()
+            text.innerHTML = 'Face Detected'
             event.data.forEach(renderBoundingBox)
             // console.log("got face");
         }
@@ -60,9 +58,7 @@ function startWebcam() {
 
 function dealWithStream(localMediaStream) {
     video = document.querySelector("video");
-    // video.src = window.URL.createObjectURL(localMediaStream);
     video.srcObject = localMediaStream;
-    // webcamStream = localMediaStream;
     video.addEventListener("resize", videoResizeEventListener);
     video.addEventListener("play", function() {detectInterval = setInterval(faceDetection, 33)});
     video.addEventListener("suspend", function() {clearInterval(detectInterval)});
@@ -70,6 +66,11 @@ function dealWithStream(localMediaStream) {
 
 function videoResizeEventListener() {
     if (video.videoWidth > 0) {
+        ui.style.width = video.videoWidth + "px"
+        ui.style.height = video.videoHeight + "px"
+        text.style.top = video.videoHeight*3/4 + "px"
+        src.width = video.videoWidth
+        src.height = video.videoHeight
         console.log("Best captured video quality: " +video.videoWidth+ "×" +video.videoHeight);
     }
     else {
@@ -85,12 +86,6 @@ function faceDetection() {
 
     // face detection
     tracking.track('#min', tracker);
-}
-
-function renderText() {
-    render_ctx.font = "36px Helvetica";
-    render_ctx.fillStyle = "#f00";
-    render_ctx.fillText("Face Detected!", 500, 480);
 }
 
 function renderBoundingBox(rect) {
