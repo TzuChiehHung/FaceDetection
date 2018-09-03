@@ -1,7 +1,7 @@
 window.onload = function(){
 
-    ui = document.getElementById("ui")
-    text = document.getElementById("text")
+    ui = document.getElementById("ui");
+    text = document.getElementById("text");
 
     // canvas for snapshot
     src = document.getElementById("src");
@@ -10,19 +10,20 @@ window.onload = function(){
     // canvas for face detection
     min = document.getElementById("min");
     min_ctx = min.getContext("2d");
+    this.console.log("Face Detection Resolution: " + min.width + "x" + min.height);
 
-    // elapsed_time = performance.now()
+    // elapsed_time = performance.now();
 
-    // canvas for websocket (testing)
+    // canvas for websocket (testing);
     // ws = document.getElementById("ws");
     // ws_ctx = ws.getContext("2d");
     // ws_img = new Image;
     // ws_img.onload = function (){
-    //     ws_ctx.drawImage(ws_img, 0, 0, 1280, 720)
+    //     ws_ctx.drawImage(ws_img, 0, 0, 1280, 720);
     // }
 
     // start webcam with max resolution
-    startWebcam()
+    startWebcam();
     
     // websocket connection
     var ws_protocol = "ws";
@@ -52,25 +53,40 @@ window.onload = function(){
     stat.domElement.style.zIndex = "100"
     document.body.appendChild(stat.domElement);
 
+    sendImgTrigger = true;
+    lastSendTimer = performance.now();
+
+
     tracker.on("track", function(event) {
-        text.innerHTML = ""
+        if (performance.now() - lastSendTimer > 500) {
+            text.innerHTML = "";
+        }
         if (event.data.length === 0) {
             // No face were detected in this frame.
             // console.log("no face");
         }
         else {
-            event.data.forEach(renderBoundingBox)
+            event.data.forEach(renderBoundingBox);
             // console.log("got face");
 
             // send image to server
-            var img_obj = {
-                width: src.width,
-                height: src.height, 
-                frame: src.toDataURL()};
-            webSocket.send(JSON.stringify(img_obj))
+            if (sendImgTrigger) {
+                var head = 'data:image/jpeg;base64,';
+                var imgDataURI = src.toDataURL("image/jpeg");
+                var imgFileSize = Math.round((imgDataURI.length - head.length)*3/4);
+                var img_obj = {
+                    width: src.width,
+                    height: src.height,
+                    frame: imgDataURI
+                };
+                webSocket.send(JSON.stringify(img_obj));
+                console.log("WebSocket SEND: " + img_obj.width + "x" + img_obj.height + " (" + imgFileSize/1024**2 + "MB)");
+                sendImgTrigger = !sendImgTrigger;
+                lastSendTimer = performance.now();
+            }
         }
-        // console.log("Face detection time: " + (performance.now()-elapsed_time).toString())
-        // elapsed_time = performance.now()
+        // console.log("Face detection time: " + (performance.now()-elapsed_time).toString());
+        // elapsed_time = performance.now();
     })
 }
 
@@ -106,11 +122,11 @@ function dealWithStream(localMediaStream) {
 
 function videoResizeEventListener() {
     if (video.videoWidth > 0) {
-        ui.style.width = video.videoWidth + "px"
-        ui.style.height = video.videoHeight + "px"
-        text.style.top = video.videoHeight*3/4 + "px"
-        src.width = video.videoWidth
-        src.height = video.videoHeight
+        ui.style.width = video.videoWidth + "px";
+        ui.style.height = video.videoHeight + "px";
+        text.style.top = video.videoHeight*3/4 + "px";
+        src.width = video.videoWidth;
+        src.height = video.videoHeight;
         console.log("Best captured video quality: " +video.videoWidth+ "×" +video.videoHeight);
     }
     else {
@@ -157,7 +173,8 @@ function openWSConnection(protocol, hostname, port, endpoint) {
             if (wsMsg.indexOf("error") > 0) {
                 console.error(wsMsg.error);
             } else {
-                text.innerHTML = "Face Detected"
+                text.innerHTML = "Face Detected";
+                sendImgTrigger = !sendImgTrigger;
                 // var img_obj = JSON.parse(wsMsg)
                 // ws.width = img_obj.width;
                 // ws.height = img_obj.height;
