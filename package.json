@@ -1,0 +1,21 @@
+{
+  "name": "acer_face.js",
+  "version": "0.0.0",
+  "description": "front-end face detection",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://douHung@bitbucket.org/douHung/facedetection.git"
+  },
+  "author": "tc.hung",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/douHung/facedetection#readme",
+  "dependencies": {
+    "dat.gui": "^0.7.2",
+    "stats.js": "^0.17.0",
+    "tracking": "^1.1.3"
+  }
+}
