@@ -3,26 +3,76 @@
   <head>
     <meta charset="utf-8">
     <title>face detection with camera</title>
+    <link rel="shortcut icon" href="">
 
     <script src="./node_modules/tracking/build/tracking-min.js"></script>
     <script src="./node_modules/tracking/build/data/face-min.js"></script>
     <script src="./node_modules/stats.js/build/stats.min.js"></script>
     <script src="./node_modules/dat.gui/build/dat.gui.min.js"></script>
     <script src="./index.js"></script>
+
+    <style>
+      #ui {
+        position: relative;
+        top: 0px;
+        left: 0px;
+      }
+      #text {
+        position: relative;
+        z-index: 10;
+        color: red;
+        font-size: 36px;
+        font-weight: bold;
+        text-align: center;
+      }
+      #video {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        -webkit-transform: scale(-1, 1);
+        -moz-transform: scale(-1, 1);
+        -o-transform: scale(-1, 1);
+        transform: scale(-1, 1);
+        filter: FlipH;
+      }
+      #min {
+        position:fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 10;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #FFAC55;
+        -webkit-transform: scaleX(-1);
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        transform: scaleX(-1);
+      }
+      #detector_ctrl {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10
+      }
+      #src {
+        display: none;
+      }
+    </style>
   </head>
+
   <body>
     <!-- User Interface -->
-    <div id=ui style="position: relateive;; top:0px; left:0px">
-      <p id=text style="position:relative; z-index:10; color:red; font-size:36px; font-weight:bold; text-align:center;"></p>
-      <video id="video" autoplay style="position:absolute; top:0px; left:0px; -moz-transform: scale(-1, 1); -webkit-transform: scale(-1, 1); -o-transform: scale(-1, 1); transform: scale(-1, 1); filter: FlipH;"></video>
+    <div id=ui>
+      <p id=text></p>
+      <video id="video" width=640 height=360 autoplay></video>
     </div>
 
     <!-- Face Detection -->
-    <canvas id ="min" width="320" height="180" style="position:fixed; top:10px; left:10px; z-index:10; border-width:5px;border-style:solid; border-color:#FFAC55;-webkit-transform: scaleX(-1); transform: scaleX(-1);"></canvas>
-    <div id="detector_gui" style="position:fixed; top:20px; right:20px; z-index:100"></div>
+    <canvas id ="min" width="320" height="180"></canvas>
+    <div id="detector_ctrl"></div>
 
     <!-- Grabbed Image -->
-    <canvas id="src" style="display:none;"></canvas>
+    <canvas id="src"></canvas>
 
     <!-- WebSocket -->
     <!-- <canvas id="ws"></canvas> -->

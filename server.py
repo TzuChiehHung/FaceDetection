@@ -7,5 +7,3 @@ httpd.socket = ssl.wrap_socket(httpd.socket, certfile='./server.pem', server_sid
 
 # try:
 httpd.serve_forever()
-
-

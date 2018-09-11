@@ -26,9 +26,9 @@ window.onload = function(){
     startWebcam();
     
     // websocket connection
-    var ws_protocol = "ws";
+    var ws_protocol = "wss";
     var ws_hostname = "10.36.172.221";
-    var ws_port     = "3000";
+    var ws_port     = "3001";
     var ws_endpoint = "";
     openWSConnection(ws_protocol, ws_hostname, ws_port, ws_endpoint);
 
@@ -38,12 +38,12 @@ window.onload = function(){
     tracker.setStepSize(2);
     tracker.setEdgesDensity(0.1);
 
-    // detector gui
+    // detector control
     var tracker_gui = new dat.GUI( {autoPlace: false} );
     tracker_gui.add(tracker, "edgesDensity", 0.1, 0.5).step(0.01);
     tracker_gui.add(tracker, "initialScale", 1.0, 10.0).step(0.1);
     tracker_gui.add(tracker, "stepSize", 1, 5).step(0.1);
-    document.getElementById("detector_gui").appendChild(tracker_gui.domElement);
+    document.getElementById("detector_ctrl").appendChild(tracker_gui.domElement);
 
     // detector fps gui
     stat = new Stats();
