@@ -1,0 +1,19 @@
+{
+  "name": "Live Face Detection Sample",
+  "version": "1.0",
+  "manifest_version": 2,
+  "description": "Haar Feature Face Detetion via tracking.js",
+  "icons": {
+    "16": "camera.png",
+    "128": "camera.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [
+    "videoCapture",
+    "fullscreen"
+  ]
+}

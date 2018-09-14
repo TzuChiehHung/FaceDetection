@@ -26,9 +26,9 @@ window.onload = function(){
     startWebcam();
     
     // websocket connection
-    var ws_protocol = "wss";
+    var ws_protocol = "ws";
     var ws_hostname = "10.36.172.221";
-    var ws_port     = "3001";
+    var ws_port     = "3000";
     var ws_endpoint = "";
     openWSConnection(ws_protocol, ws_hostname, ws_port, ws_endpoint);
 
@@ -122,9 +122,9 @@ function dealWithStream(localMediaStream) {
 
 function videoResizeEventListener() {
     if (video.videoWidth > 0) {
-        ui.style.width = video.videoWidth + "px";
-        ui.style.height = video.videoHeight + "px";
-        text.style.top = video.videoHeight*3/4 + "px";
+        ui.style.width = video.width + "px";
+        ui.style.height = video.height + "px";
+        text.style.top = video.height*3/4 + "px";
         src.width = video.videoWidth;
         src.height = video.videoHeight;
         console.log("Best captured video quality: " +video.videoWidth+ "×" +video.videoHeight);
