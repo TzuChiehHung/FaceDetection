@@ -2,40 +2,40 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>face detection with camera</title>
+    <title>grab image from camera</title>
     <link rel="shortcut icon" href="">
 
-    <script src="./node_modules/tracking/build/tracking-min.js"></script>
-    <script src="./node_modules/tracking/build/data/face-min.js"></script>
+    <!-- <script src="./node_modules/tracking/build/tracking-min.js"></script> -->
+    <!-- <script src="./node_modules/tracking/build/data/face-min.js"></script> -->
     <script src="./node_modules/stats.js/build/stats.min.js"></script>
-    <script src="./node_modules/dat.gui/build/dat.gui.min.js"></script>
+    <!-- <script src="./node_modules/dat.gui/build/dat.gui.min.js"></script> -->
     <script src="./app.js"></script>
 
     <style>
       #ui {
-        position: relative;
+        position: absolute;
         top: 0px;
         left: 0px;
       }
-      #text {
+      /* #text {
         position: relative;
         z-index: 10;
         color: red;
         font-size: 36px;
         font-weight: bold;
         text-align: center;
-      }
+      } */
       #video {
-        position: absolute;
+        /* position: absolute;
         top: 0px;
-        left: 0px;
+        left: 0px; */
         -webkit-transform: scale(-1, 1);
         -moz-transform: scale(-1, 1);
         -o-transform: scale(-1, 1);
         transform: scale(-1, 1);
         filter: FlipH;
       }
-      #min {
+      /* #min {
         position:fixed;
         top: 10px;
         left: 10px;
@@ -47,32 +47,59 @@
         -moz-transform: scaleX(-1);
         -o-transform: scaleX(-1);
         transform: scaleX(-1);
-      }
-      #detector_ctrl {
+      } */
+      /* #detector_ctrl {
         position: fixed;
         top: 20px;
         right: 20px;
         z-index: 10
-      }
-      #src {
+      } */
+      /* #src {
         display: none;
-      }
+      } */
+      /* #result {
+        border-width: 5px;
+        border-style: solid;
+        border-color: #FFAC55;
+      } */
     </style>
   </head>
 
   <body>
-    <!-- User Interface -->
-    <div id=ui>
-      <p id=text></p>
-      <video id="video" width=640 height=360 autoplay></video>
+    <!-- Main -->
+    <!-- <div id=ui> -->
+      <h1>video</h1>
+      <video id="video" autoplay></video>
+      <h1>render</h1>
+      <canvas id="render"></canvas>
+    <!-- </div> -->
+    
+    <div id=img_proc>
+        <h1>src</h1>
+      <canvas id="src"></canvas>
+      <h1>min</h1>
+      <canvas id ="min" width="640" height="360"></canvas>
+      <h1>result</h1>
+      <canvas id ="result"></canvas>
     </div>
+    
+
+
+
+
+
+    <!-- User Interface -->
+    <!-- <div id=ui>
+      <p id=text></p>
+      <video id="video" width=1920 height=1080 autoplay></video>
+    </div> -->
 
     <!-- Face Detection -->
-    <canvas id ="min" width="320" height="180"></canvas>
-    <div id="detector_ctrl"></div>
+    <!-- <canvas id ="min" width="320" height="180"></canvas>
+    <div id="detector_ctrl"></div> -->
 
     <!-- Grabbed Image -->
-    <canvas id="src"></canvas>
+    <!-- <canvas id="src"></canvas> -->
 
     <!-- WebSocket -->
     <!-- <canvas id="ws"></canvas> -->
