@@ -66,7 +66,7 @@ window.onload = function(){
             // console.log("no face");
         }
         else {
-            event.data.forEach(renderBoundingBox);
+            event.data.forEach(trackerBoundingBox);
             // console.log("got face");
 
             // send image to server
@@ -122,9 +122,6 @@ function dealWithStream(localMediaStream) {
 
 function videoResizeEventListener() {
     if (video.videoWidth > 0) {
-        ui.style.width = video.width + "px";
-        ui.style.height = video.height + "px";
-        text.style.top = video.height*3/4 + "px";
         src.width = video.videoWidth;
         src.height = video.videoHeight;
         console.log("Best captured video quality: " +video.videoWidth+ "×" +video.videoHeight);
@@ -146,7 +143,7 @@ function faceDetection() {
     stat.end();
 }
 
-function renderBoundingBox(rect) {
+function trackerBoundingBox(rect) {
     min_ctx.strokeStyle = "red";
     min_ctx.lineWidth = 5;
     min_ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
@@ -168,11 +165,10 @@ function openWSConnection(protocol, hostname, port, endpoint) {
             console.log("WebSocket ERROR: " + JSON.stringify(errorEvent, null, 4));
         };
         webSocket.onmessage = function (messageEvent) {
-            var wsMsg = messageEvent.data;
-            // console.log("WebSocket MESSAGE: " + wsMsg);
-            if (wsMsg.indexOf("error") > 0) {
-                console.error(wsMsg.error);
+            if (messageEvent.data.indexOf("error") > 0) {
+                console.error(messageEvent.data.error);
             } else {
+                console.log(messageEvent.data)
                 text.innerHTML = "Face Detected";
                 sendImgTrigger = !sendImgTrigger;
                 // var img_obj = JSON.parse(wsMsg)
