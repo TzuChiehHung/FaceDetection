@@ -1,7 +1,5 @@
 window.onload = function(){
 
-    ui = document.getElementById("ui");
-
     // canvas for snapshot
     src = document.getElementById("src");
     src_ctx = src.getContext("2d");
@@ -135,7 +133,8 @@ function videoResizeEventListener() {
 }
 
 function grabImage() {
-    // stat.begin();
+    stat.end();
+    stat.begin();
     // update canvas
     src_ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     min_ctx.drawImage(src, 0, 0, min.width, min.height);
