@@ -5,8 +5,6 @@ window.onload = function(){
     // canvas for snapshot
     src = document.getElementById("src");
     src_ctx = src.getContext("2d");
-    render = document.getElementById("render");
-    render_ctx = render.getContext("2d");
 
     // canvas for face detection and recognition
     min = document.getElementById("min");
@@ -16,6 +14,10 @@ window.onload = function(){
     result.width = min.width;
     result.height = min.height;
     result_ctx = result.getContext("2d");
+
+    // overlay results on video
+    overlay = document.getElementById("overlay");
+    overlay_ctx = overlay.getContext("2d");
 
     // start webcam with max resolution
     startWebcam();
@@ -59,12 +61,66 @@ function startWebcam() {
 }
 
 function dealWithStream(localMediaStream) {
-    video = document.querySelector("video");
+    container = document.querySelector('#container');
+    video = document.querySelector("#video");
     video.srcObject = localMediaStream;
     video.addEventListener("resize", videoResizeEventListener);
-    video.addEventListener("play", function() {sendInterval = setInterval(function() {grabImage(); sendImage();}, 50)});
+    video.addEventListener("play", function() {sendInterval = setInterval(function() {grabImage(); sendImage();}, 0)});
     video.addEventListener("suspend", function() {clearInterval(sendInterval)});
+    video.addEventListener('loadedmetadata', setVideoDimensions, false);
+    window.addEventListener('resize', setVideoDimensions, false);
 }
+
+var setVideoDimensions = function () {
+    // Video's intrinsic dimensions
+    var w = video.videoWidth;
+    var h = video.videoHeight;
+
+    // Intrinsic Ratio
+    // Will be more than 1 if W > H and less if W < H
+    var videoRatio = (w / h).toFixed(2);
+
+    // Get the container's computed styles
+    //
+    // Also calculate the min dimensions required (this will be
+    // the container dimentions)
+    var containerStyles = window.getComputedStyle(container);
+    var minW = parseInt( containerStyles.getPropertyValue('width'));
+    var minH = parseInt( containerStyles.getPropertyValue('height'));
+
+    // What's the min:intrinsic dimensions
+    //
+    // The idea is to get which of the container dimension
+    // has a higher value when compared with the equivalents
+    // of the video. Imagine a 1200x700 container and
+    // 1000x500 video. Then in order to find the right balance
+    // and do minimum scaling, we have to find the dimension
+    // with higher ratio.
+    //
+    // Ex: 1200/1000 = 1.2 and 700/500 = 1.4 - So it is best to
+    // scale 500 to 700 and then calculate what should be the
+    // right width. If we scale 1000 to 1200 then the height
+    // will become 600 proportionately.
+    var widthRatio = minW / w;
+    var heightRatio = minH / h;
+
+    // Whichever ratio is more, the scaling
+    // has to be done over that dimension
+    if (widthRatio > heightRatio) {
+      var newWidth = minW;
+      var newHeight = Math.ceil( newWidth / videoRatio );
+    }
+    else {
+      var newHeight = minH;
+      var newWidth = Math.ceil( newHeight * videoRatio );
+    }
+
+    video.width = newWidth;
+    video.height = newHeight;
+    overlay.width = newWidth;
+    overlay.height = newHeight;
+}
+
 
 function videoResizeEventListener() {
     if (video.videoWidth > 0) {
@@ -90,30 +146,30 @@ function sendImage() {
     var imgDataURI = min.toDataURL("image/jpeg");
     var imgFileSize = Math.round((imgDataURI.length - head.length)*3/4);
     var img_obj = {
-        width: src.width,
-        height: src.height,
+        width: min.width,
+        height: min.height,
         frame: imgDataURI
     };
     webSocket.send(JSON.stringify(img_obj));
     console.log("WebSocket SEND: " + img_obj.width + "x" + img_obj.height + " (" + imgFileSize/1024**2 + "MB)");
 }
 
-function renderResult(jsonData, flip) {
+function overlayResult(jsonData, flip) {
     if (flip) {
-        var x = min.width - jsonData.BBX[2]
+        var x = min.width - jsonData.BBX[2];
     }
     else {
-        var x = jsonData.BBX[0]
+        var x = jsonData.BBX[0];
     }
-    var y = jsonData.BBX[1]
-    var w = jsonData.BBX[2] - jsonData.BBX[0]
-    var h = jsonData.BBX[3] - jsonData.BBX[1]
+    var y = jsonData.BBX[1];
+    var w = jsonData.BBX[2] - jsonData.BBX[0];
+    var h = jsonData.BBX[3] - jsonData.BBX[1];
 
     result_ctx.font = "28px Georgia";
     result_ctx.fillStyle = "green";
     result_ctx.fillText(jsonData.Name, x, y);
     result_ctx.strokeStyle = "cyan";
-    result_ctx.strokeRect(x, y, w, h)
+    result_ctx.strokeRect(x, y, w, h);
 }
 
 function openWSConnection(protocol, hostname, port, endpoint) {
@@ -132,19 +188,20 @@ function openWSConnection(protocol, hostname, port, endpoint) {
             console.log("WebSocket ERROR: " + JSON.stringify(errorEvent, null, 4));
         }
         webSocket.onmessage = function (messageEvent) {
+            result_ctx.clearRect(0, 0, result.width, result.height);
+            overlay_ctx.clearRect(0, 0, overlay.width, overlay.height);
             if (messageEvent.data.indexOf("error") > 0) {
                 console.error(messageEvent.data.error);
             } else {
-                if (messageEvent.data === "NoFace"){
-                    // no face
+                if (messageEvent.data == ""){
+                    console.log("No Face");
                 }
                 else {
-                    // var jsonData = JSON.parse(messageEvent.data);
-                    var jsonData = {"Name":"TC Hung","BBX":[69, 26, 156, 156]};
-                    renderResult(jsonData, flip=true);
-                    render.width = 1280;
-                    render.height = 720;
-                    render_ctx.drawImage(result, 0, 0, 1280, 720);
+                    var jsonData = JSON.parse(messageEvent.data);
+                    jsonData.FaceList.forEach(function(face) {
+                        overlayResult(face, flip=true);
+                    })
+                    overlay_ctx.drawImage(result, 0, 0, overlay.width, overlay.height);
                 }
             }
         }
