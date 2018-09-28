@@ -27,13 +27,23 @@ window.onload = function(){
     var ws_endpoint = "";
     openWSConnection(ws_protocol, ws_hostname, ws_port, ws_endpoint);
 
-    // fps gui
-    stat = new Stats();
-    stat.domElement.style.position = "fixed";
-    stat.domElement.style.left = "20px";
-    stat.domElement.style.top = "20px";
-    stat.domElement.style.zIndex = "100"
-    document.body.appendChild(stat.domElement);
+    // send fps gui
+    send_stat = new Stats();
+    send_stat.domElement.style.position = "fixed";
+    send_stat.domElement.style.left = "20px";
+    send_stat.domElement.style.top = "20px";
+    send_stat.domElement.style.zIndex = "100"
+    document.body.appendChild(send_stat.domElement);
+
+    // receive fps gui
+    receive_stat = new Stats();
+    receive_stat.domElement.style.position = "fixed";
+    receive_stat.domElement.style.left = "120px";
+    receive_stat.domElement.style.top = "20px";
+    receive_stat.domElement.style.zIndex = "100"
+    document.body.appendChild(receive_stat.domElement);
+
+
 }
 
 function startWebcam() {
@@ -63,7 +73,7 @@ function dealWithStream(localMediaStream) {
     video = document.querySelector("#video");
     video.srcObject = localMediaStream;
     video.addEventListener("resize", videoResizeEventListener);
-    video.addEventListener("play", function() {sendInterval = setInterval(function() {grabImage(); sendImage();}, 0)});
+    video.addEventListener("play", function() {sendInterval = setInterval(function() {send_stat.end();send_stat.begin();grabImage(); sendImage();}, 0)});
     video.addEventListener("suspend", function() {clearInterval(sendInterval)});
     video.addEventListener('loadedmetadata', setVideoDimensions, false);
     window.addEventListener('resize', setVideoDimensions, false);
@@ -133,8 +143,6 @@ function videoResizeEventListener() {
 }
 
 function grabImage() {
-    stat.end();
-    stat.begin();
     // update canvas
     src_ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
     min_ctx.drawImage(src, 0, 0, min.width, min.height);
@@ -187,6 +195,8 @@ function openWSConnection(protocol, hostname, port, endpoint) {
             console.log("WebSocket ERROR: " + JSON.stringify(errorEvent, null, 4));
         }
         webSocket.onmessage = function (messageEvent) {
+            receive_stat.end();
+            receive_stat.begin();
             result_ctx.clearRect(0, 0, result.width, result.height);
             overlay_ctx.clearRect(0, 0, overlay.width, overlay.height);
             if (messageEvent.data.indexOf("error") > 0) {
