@@ -50,8 +50,8 @@ function startWebcam() {
     var constraints = {
         audio: false,
         video: {
-            width: { ideal: 4096 },
-            height: { ideal: 2160 } 
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
         }
     };
 
