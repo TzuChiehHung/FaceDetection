@@ -42,8 +42,6 @@ window.onload = function(){
     receive_stat.domElement.style.top = "20px";
     receive_stat.domElement.style.zIndex = "100"
     document.body.appendChild(receive_stat.domElement);
-
-
 }
 
 function startWebcam() {
@@ -172,11 +170,37 @@ function overlayResult(jsonData, flip) {
     var w = jsonData.BBX[2] - jsonData.BBX[0];
     var h = jsonData.BBX[3] - jsonData.BBX[1];
 
-    result_ctx.font = "28px Georgia";
-    result_ctx.fillStyle = "green";
-    result_ctx.fillText(jsonData.Name, x, y);
-    result_ctx.strokeStyle = "cyan";
-    result_ctx.strokeRect(x, y, w, h);
+    result_ctx.font = "14px Arial";
+    result_ctx.fillStyle = "yellow";
+    result_ctx.fillText(jsonData.Name, x+5, y-5);
+    // result_ctx.strokeRect(x, y, w, h);
+    drawBoundingBox(result_ctx, x, y, w, h);
+}
+
+function drawBoundingBox(cvs, x, y, w, h) {
+    cvs.strokeStyle = "yellow";
+    cvs.lineWidth = 2;
+    var dw = Math.round(0.2 * w);
+    var dh = Math.round(0.2 * h);
+
+    cvs.beginPath();
+    // top left
+    cvs.moveTo(x, y+dh);
+    cvs.lineTo(x, y);
+    cvs.lineTo(x+dw, y);
+    // top right
+    cvs.moveTo(x+w-dw, y);
+    cvs.lineTo(x+w, y);
+    cvs.lineTo(x+w, y+dh);
+    // bottom left
+    cvs.moveTo(x, y+h-dh);
+    cvs.lineTo(x, y+h);
+    cvs.lineTo(x+dw, y+h);
+    // bottom right
+    cvs.moveTo(x+w-dw, y+h);
+    cvs.lineTo(x+w, y+h);
+    cvs.lineTo(x+w, y+h-dh);
+    cvs.stroke();
 }
 
 function openWSConnection(protocol, hostname, port, endpoint) {
@@ -197,6 +221,7 @@ function openWSConnection(protocol, hostname, port, endpoint) {
         webSocket.onmessage = function (messageEvent) {
             receive_stat.end();
             receive_stat.begin();
+
             result_ctx.clearRect(0, 0, result.width, result.height);
             overlay_ctx.clearRect(0, 0, overlay.width, overlay.height);
             if (messageEvent.data.indexOf("error") > 0) {
